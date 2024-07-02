@@ -19,9 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Input.h" />
+    <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Test.h" />
+    <ClInclude Include="Source\Vector2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Input.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Test.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
