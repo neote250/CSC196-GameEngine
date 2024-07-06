@@ -2,10 +2,15 @@
 #include "Renderer.h"
 #include "Vector2.h"
 #include "Input.h"
+#include "Particle.h"
+#include "Random.h"
+#include "EngineTime.h"
+
 #include <SDL.h>
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+
 
 
 int main(int argc, char* argv[]) {
@@ -18,21 +23,24 @@ int main(int argc, char* argv[]) {
 	Input input;
 	input.Initialize();
 
-	Vector2 v1{ 400,300 };
-	Vector2 v2{ 700,500 };
+	Time time;
+
+	std::vector<Particle> particles;
+	//for (int i = 0; i < 0; i++)
+	//{
+	//	particles.push_back(Particle{ { rand() % 800, rand() % 800 }, { randomf(100,300),0.0f}, randomf(1,5) });
+	//}
+
+
+
 
 	std::vector<Vector2> points;
-	//for (int i = 0; i < 100; i++) {
-	//	points.push_back(Vector2{ rand() % 800, rand() % 600 });
-	//}
 
 	bool quit = false;
 	//main loop
 	while (!quit)
 	{
-		//input
-		//update
-		//draw
+		time.Tick();
 
 		//INPUT
 		input.Update();
@@ -44,21 +52,25 @@ int main(int argc, char* argv[]) {
 
 		//UPDATE
 		Vector2 mousePosition = input.GetMousePosition();
-		//std::cout << mousePosition.x << " " << mousePosition.y << std::endl;
-
-		if (input.GetMouseButtonDown(0) && !input.GetPreviousMouseButtonDown(0)) {
-			std::cout << "Mouse Pressed\n";
-			points.push_back(mousePosition);
+		if (input.GetMouseButtonDown(0)) {
+			particles.push_back(Particle{ mousePosition,{ randomf(-300,300), randomf(-200,200)}, randomf(1,5) });
 		}
 
-		if (input.GetMouseButtonDown(0)&& input.GetPreviousMouseButtonDown(0)){
-			float distance = (points.back() - mousePosition).Length();
-			if (distance>25) points.push_back(mousePosition);
+		for (Particle& particle : particles)
+		{
+			particle.Update(time.GetDeltaTime());
+
+			if (particle.position.x > 800) particle.position.x = 0;
+			if (particle.position.x < 0) particle.position.x = 800;
 		}
 
-		//Vector2 speed{ 0.1f,-0.1f };
-		//for (Vector2& point : points) {
-		//	point = point + 0.002f;
+		//if (input.GetMouseButtonDown(0) && !input.GetPreviousMouseButtonDown(0)) {
+		//	std::cout << "Mouse Pressed\n";
+		//	points.push_back(mousePosition);
+		//}
+		//if (input.GetMouseButtonDown(0)&& input.GetPreviousMouseButtonDown(0)){
+		//	float distance = (points.back() - mousePosition).Length();
+		//	if (distance>25) points.push_back(mousePosition);
 		//}
 
 		//DRAW
@@ -67,18 +79,12 @@ int main(int argc, char* argv[]) {
 		renderer.BeginFrame();
 
 		//Draw line
-		renderer.SetColor(255, 255, 255, 0);
-		//renderer.DrawLine(300, 400, 400, 300);
-		//renderer.DrawLine(400, 300, 500, 400);
-		//renderer.DrawLine(400, 300, 500, 400);
-		//renderer.DrawLine(500, 400, 300, 400);
-		//renderer.DrawLine(v1.x, v1.y, v2.x, v2.y);
-
-		for (int i = 0; points.size()>1 && i < points.size()-1; i++) {
-			//renderer.SetColor(rand() % 256, rand() % 256, rand() % 256, 0);
-			renderer.DrawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+		
+		for (Particle particle : particles)
+		{
+			renderer.SetColor(particle.red, particle.blue, particle.green, 0);
+			particle.Draw(renderer);
 		}
-
 		
 
 		// show screen
