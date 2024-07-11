@@ -14,7 +14,11 @@ struct Particle
 	Particle(Vector2 position, Vector2 velocity) : 
 		position{position}
 		, velocity{velocity}
-		{}
+	{
+		red = random(255);
+		green = random(255);
+		blue = random(255);
+	}
 	Particle(Vector2 position, Vector2 velocity, float lifespan) :
 		position{ position }
 		, velocity{ velocity }
