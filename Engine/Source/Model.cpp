@@ -25,3 +25,17 @@ void Model::Draw(Renderer& renderer, const Transform& transform)
 		renderer.DrawLine(p1.x, p1.y, p2.x, p2.y);
 	}
 }
+
+float Model::GetRadius()
+{
+	float radius = 0;
+
+	for (const Vector2& point : _points) {
+		float r = point.Length();
+		if (r > radius) {
+			radius = r;
+		}
+	}
+
+	return radius;
+}
