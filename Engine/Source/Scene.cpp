@@ -6,11 +6,11 @@
 void Scene::Update(float dt)
 {
 	//update
-	for (Actor* actor : _actors) {actor->Update(dt);}
+	for (auto& actor : _actors) {actor->Update(dt);}
 
 	//destroy
 	_actors.erase(
-		std::remove_if(_actors.begin(), _actors.end(), [](Actor* actor) {return actor->_destroyed; })
+		std::remove_if(_actors.begin(), _actors.end(), [](auto& actor) {return actor->_destroyed; })
 		, _actors.end()
 	);
 	//std::erase_if(_actors, [](Actor* actor) {return actor->_destroyed; });
@@ -22,8 +22,8 @@ void Scene::Update(float dt)
 
 
 	//collision
-	for (Actor* actor1 : _actors) { 
-		for (Actor* actor2 : _actors) {
+	for (auto& actor1 : _actors) { 
+		for (auto& actor2 : _actors) {
 			if (actor1 == actor2 || (actor1->_destroyed||actor2->_destroyed)) continue;
 
 			Vector2 direction = actor1->GetTranform().position - actor2->GetTranform().position;
@@ -32,8 +32,8 @@ void Scene::Update(float dt)
 			float radius = actor1->GetRadius() + actor2->GetRadius();
 
 			if (distance <= radius) {
-				actor1->OnCollision(actor2);
-				actor2->OnCollision(actor1);
+				actor1->OnCollision(actor2.get());
+				actor2->OnCollision(actor1.get());
 			}
 		}
 	}
@@ -44,15 +44,15 @@ void Scene::Update(float dt)
 
 void Scene::Draw(Renderer& renderer)
 {
-	for (Actor* actor : _actors) {
+	for (auto& actor : _actors) {
 		actor->Draw(renderer);
 	}
 }
 
-void Scene::AddActor(Actor* actor)
+void Scene::AddActor(std::unique_ptr<Actor> actor)
 {
 	actor->_scene = this;
-	_actors.push_back(actor);
+	_actors.push_back(std::move(actor));
 }
 
 void Scene::RemoveAll()

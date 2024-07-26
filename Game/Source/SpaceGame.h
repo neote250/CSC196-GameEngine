@@ -30,6 +30,8 @@ private:
 	float _spawnTimer{ 0 };
 	float _spawnTime{ 0 };
 	float _stateTimer{ 0 };
+	int _pickupCount{ 0 };
+	int _inGameScore{ 0 };
 
 	Font* _font{ nullptr };
 	Font* _fontLarge{ nullptr };

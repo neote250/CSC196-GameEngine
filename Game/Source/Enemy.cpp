@@ -20,8 +20,7 @@ void Enemy::Update(float dt)
 void Enemy::OnCollision(Actor* actor)
 {
 	if (actor->GetTag() == "Player") {
-		_scene->GetGame()->AddPoints(100);
+		_scene->GetGame()->AddPoints(_pointsWorth);
 		_destroyed = true;
-		
 	}
 }

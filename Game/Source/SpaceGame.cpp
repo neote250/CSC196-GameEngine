@@ -22,6 +22,7 @@ bool SpaceGame::Initialize()
     _textScore = new Text(_font);
     _textLives = new Text(_font);
     _textTitle = new Text(_fontLarge);
+    AUDIO.AddSound("bass.wav");
 
     return true;
 }
@@ -35,7 +36,7 @@ void SpaceGame::Update(float dt)
     switch (_state)
     {
     case eState::Title:
-        if (INPUT->GetKeyDown(SDL_SCANCODE_SPACE)) {
+        if (INPUT.GetKeyDown(SDL_SCANCODE_SPACE)) {
             _state = eState::StartGame;
         }
         break;
@@ -48,40 +49,47 @@ void SpaceGame::Update(float dt)
         _scene->RemoveAll();
         {
             Model* model = new Model{};
-            Transform transform{ {RENDERER->GetWidth() / 2, RENDERER->GetHeight() / 2}, 0, 5 };
-            Player* player = new Player(400, transform, model);
+            Transform transform{ {RENDERER.GetWidth() / 2, RENDERER.GetHeight() / 2}, 0, 5 };
+            auto player = std::make_unique<Player>(400.0f, transform, model);
             player->SetDamping(2.0f);
             player->SetTag("Player");
-            _scene->AddActor(player);
+            _scene->AddActor(std::move(player));
         }
 
         _spawnTime = 3;
         _spawnTimer = _spawnTime;
-
+        _pickupCount = 2;
         _state = eState::Game;
         break;
     case eState::Game:
         _spawnTimer -= dt;
         if (_spawnTimer <= 0) {
-            _spawnTime -= 0.2f;
+            if (_spawnTime >= 1.0f) {
+                _spawnTime -= 0.2f;
+            }
             _spawnTimer = _spawnTime;
 
             Model* enemyModel = new Model{ GameData::shipPoints, Color{1,0,0} };
-            Enemy* enemy = new Enemy(200, Transform{ {random(RENDERER->GetWidth()), random(RENDERER->GetHeight())}, 0, 2 }, enemyModel);
+            auto enemy = std::make_unique<Enemy>(200.0f, Transform{ {random(RENDERER.GetWidth()), random(RENDERER.GetHeight())}, 0, 2 }, enemyModel);
             enemy->SetDamping(1.0f);
             enemy->SetTag("Enemy");
-            _scene->AddActor(enemy);
-
+            _scene->AddActor(std::move(enemy));
+            _pickupCount--;
+        }
+        //_inGameScore = GetScore();
+        if (_pickupCount == 0) {
             //create pickup
             auto* pickupModel = new Model{ GameData::shipPoints, Color{0,1,0} };
-            auto* pickup = new Pickup(Transform{ {random(RENDERER->GetWidth()), random(RENDERER->GetHeight())}, 0, 2 }, pickupModel);
+            auto pickup = std::make_unique<Pickup>(Transform{ {random(RENDERER.GetWidth()), random(RENDERER.GetHeight())}, 0, 5 }, pickupModel);
             pickup->SetTag("Pickup");
-            _scene->AddActor(pickup);
+            _scene->AddActor(std::move(pickup));
+            _pickupCount = 2;
         }
-
         
         break;
     case eState::PlayerDead:
+        
+        AUDIO.PlaySound("bass.wav");
         _stateTimer -= dt;
         if(_stateTimer<=0) _state = eState::StartLevel;
 
@@ -110,10 +118,6 @@ void SpaceGame::Draw(Renderer& renderer)
         //text->Draw(*RENDERER, 40, 40);
 
         break;
-    case SpaceGame::eState::Game:
-
-
-        break;
     case SpaceGame::eState::GameOver:
         //draw text "game over"
         _textTitle->Create(renderer, "Game Over", { 0,0,1 });
@@ -124,21 +128,23 @@ void SpaceGame::Draw(Renderer& renderer)
     }
 
     //draw score
-    std::string text = "Score: " + std::to_string(_score);
+    std::string points = std::to_string(_score);
+    std::string text = "Score: " + points;
     _textScore->Create(renderer, text, { 0,0,1 });
     _textScore->Draw(renderer, 20, 20);
+    std::cout << text << std::endl;
     //draw lives
     text = "Lives: " + std::to_string(GetLives());
     _textLives->Create(renderer, text, { 0,0,1 });
     _textLives->Draw(renderer, renderer.GetWidth() - 100, 20);
 
     _scene->Draw(renderer);
-
+    
 }
 
 void SpaceGame::OnPlayerDeath()
 {
     _lives--;
     _state = (_lives ==0) ? eState::GameOver : eState::PlayerDead;
-    _stateTimer = 3;
+    _stateTimer = 1;
 }

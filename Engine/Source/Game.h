@@ -4,10 +4,11 @@ class Engine;
 class Renderer;
 class Scene;
 
+
 class Game {
 public:
 	Game() {}
-	Game(Engine* engine) :_engine{ engine } {}
+	Game(Engine* engine) : _engine{ engine } {}
 
 	virtual bool Initialize() = 0;
 	virtual void Shutdown() = 0;
@@ -27,4 +28,5 @@ protected:
 
 	Engine* _engine{ nullptr };
 	Scene* _scene{ nullptr };
+
 };

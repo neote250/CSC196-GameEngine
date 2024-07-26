@@ -16,8 +16,10 @@ public:
 
 	void Update(float dt);
 	virtual void OnCollision(Actor* actor);
+	void IncreasePoints() { _pointsWorth * 10; }
 
 private:
 	float _speed = 0;
 	float _fireTimer = 0;
+	int _pointsWorth = 100;
 };

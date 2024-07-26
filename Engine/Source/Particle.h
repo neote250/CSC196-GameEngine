@@ -5,10 +5,18 @@
 
 struct Particle
 {
-	Vector2 position { 0,0 };
-	Vector2 velocity { 0,0 };
+	struct Data {
+		Vector2 position{ 0,0 };
+		Vector2 velocity{ 0,0 };
+		float lifespan = 0;
+		uint8_t red{ 255 }, green{ 255 }, blue{ 255 }, alpha{ 0 };
+	};
+
+	Vector2 position{ 0,0 };
+	Vector2 velocity{ 0,0 };
 	float lifespan = 0;
-	uint8_t red, green, blue, alpha;
+	uint8_t red{ 255 }, green{ 255 }, blue{ 255 }, alpha{ 0 };
+	bool isActive{ false };
 
 	Particle() = default;
 	Particle(Vector2 position, Vector2 velocity) : 
@@ -28,6 +36,8 @@ struct Particle
 		green = random(255);
 		blue = random(255);
 	}
+
+	void Initialize(const Data& data);
 
 	void Update(float dt);
 	void Draw(Renderer& renderer);

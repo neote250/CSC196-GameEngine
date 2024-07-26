@@ -1,9 +1,10 @@
 #pragma once
 
 #include <list>
+#include <memory>
 
 class Renderer;
-class Actor;//ask about forward declaration
+class Actor;
 class Game;
 
 class Scene
@@ -15,7 +16,7 @@ public:
 	void Update(float dt);
 	void Draw(Renderer& renderer);
 
-	void AddActor(Actor* actor);
+	void AddActor(std::unique_ptr<Actor> actor);
 	void RemoveAll();
 
 	template<typename T>
@@ -24,15 +25,15 @@ public:
 	Game* GetGame() { return _game; }
 
 protected:
-	std::list<Actor*> _actors;
+	std::list<std::unique_ptr<Actor>> _actors;
 	Game* _game{ nullptr };
 
 };
 //templates need to be in the header
 template<typename T>
 T* Scene::GetActor() {
-	for (Actor* actor : _actors) {
-		T* result = dynamic_cast<T*>(actor);
+	for (auto& actor : _actors) {
+		T* result = dynamic_cast<T*>(actor.get());
 		if (result) return result;
 	}
 

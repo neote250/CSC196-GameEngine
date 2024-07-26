@@ -18,28 +18,23 @@ int main(int argc, char* argv[]) {
 	SpaceGame* game = new SpaceGame(&g_engine);
 	game->Initialize();
 
-	Font* font = new Font();
-	font->Load("arcadeclassic.ttf", 20);
-
-	Text* text = new Text(font);
-	text->Create(*RENDERER, "Hello World", Color{ 1, 1, 1, 1 });
-
-
 	while (!g_engine.IsQuit())
 	{
 		g_engine.Update();
-		game->Update(g_engine.GetTime().GetDeltaTime());
+		game->Update(TIME.GetDeltaTime());
 
-		RENDERER->SetColor(0, 0, 0);
-		RENDERER->BeginFrame();
+		RENDERER.SetColor(0, 0, 0);
+		RENDERER.BeginFrame();
 
-		game->Draw(*RENDERER);
+		game->Draw(RENDERER);
 		//text->Draw(*RENDERER, 40, 40);
+		g_engine.GetParticleSystem().Draw(RENDERER);
 
-
-		RENDERER->EndFrame();
+		RENDERER.EndFrame();
 
 	}
+
+	g_engine.Shutdown();
 
 	return 0;
 }
